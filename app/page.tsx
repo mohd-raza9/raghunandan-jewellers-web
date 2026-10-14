@@ -10,7 +10,6 @@ import {
   ChevronDown,
   Heart,
   MapPin,
-  MessageCircle,
   Minus,
   Menu,
   Plus,
@@ -220,12 +219,12 @@ type Product = (typeof products)[number]
 type CartItem = { product: Product; quantity: number }
 
 const instagramReels = [
-  { shortcode: 'DeJwlK6z_TW', url: 'https://www.instagram.com/p/DeJwlK6z_TW/?hl=en', title: 'A closer look at the craft', image: '/images/Bridal.png' },
-  { shortcode: 'DdbeGWCzDf8', url: 'https://www.instagram.com/p/DdbeGWCzDf8/?hl=en', title: 'Jewellery made to be remembered', image: '/images/Earrings.png' },
-  { shortcode: 'DcOCDdGzypv', url: 'https://www.instagram.com/p/DcOCDdGzypv/?hl=en', title: 'Details in every design', image: '/images/necklace.png' },
-  { shortcode: 'DZr-zfrzOOM', url: 'https://www.instagram.com/p/DZr-zfrzOOM/?hl=en', title: 'A little golden inspiration', image: '/images/gold.png' },
-  { shortcode: 'DZmItEMzu3L', url: 'https://www.instagram.com/p/DZmItEMzu3L/?hl=en', title: 'An heirloom in the making', image: '/images/treditional.png' },
-  { shortcode: 'Db8U9pJzSsY', url: 'https://www.instagram.com/p/Db8U9pJzSsY/?hl=en', title: 'Celebrate your own story', image: '/images/bangles.png' },
+  { shortcode: 'DeJwlK6z_TW', url: 'https://www.instagram.com/p/DeJwlK6z_TW/?hl=en', title: 'A closer look at the craft', image: '/images/Bridal.png', productIndex: 3 },
+  { shortcode: 'DdbeGWCzDf8', url: 'https://www.instagram.com/p/DdbeGWCzDf8/?hl=en', title: 'Jewellery made to be remembered', image: '/images/Earrings.png', productIndex: 1 },
+  { shortcode: 'DcOCDdGzypv', url: 'https://www.instagram.com/p/DcOCDdGzypv/?hl=en', title: 'Details in every design', image: '/images/necklace.png', productIndex: 0 },
+  { shortcode: 'DZr-zfrzOOM', url: 'https://www.instagram.com/p/DZr-zfrzOOM/?hl=en', title: 'A little golden inspiration', image: '/images/gold.png', productIndex: 7 },
+  { shortcode: 'DZmItEMzu3L', url: 'https://www.instagram.com/p/DZmItEMzu3L/?hl=en', title: 'An heirloom in the making', image: '/images/treditional.png', productIndex: 8 },
+  { shortcode: 'Db8U9pJzSsY', url: 'https://www.instagram.com/p/Db8U9pJzSsY/?hl=en', title: 'Celebrate your own story', image: '/images/bangles.png', productIndex: 2 },
 ]
 
 function InstagramMark({ className }: { className?: string }) {
@@ -247,8 +246,27 @@ function InstagramMark({ className }: { className?: string }) {
   )
 }
 
+function WhatsAppMark({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M20.2 11.8a8.2 8.2 0 0 1-12.1 7.1L3 20l1.2-4.9a8.2 8.2 0 1 1 16-3.3Z" />
+      <path d="M8.5 8.1c.2-.5.5-.5.8-.5h.5c.2 0 .4.1.5.4l.7 1.7c.1.2.1.4 0 .6l-.5.7c-.2.2-.3.4-.1.7.3.5.8 1.1 1.3 1.5.6.5 1.2.8 1.6.9.3.1.5 0 .7-.2l.8-.9c.2-.2.4-.2.7-.1l1.6.8c.3.1.4.3.4.5 0 .3-.2 1.2-.7 1.6-.5.5-1.2.7-1.9.7-.6 0-1.5-.2-2.8-.8-1.2-.6-2.3-1.5-3.2-2.6-.8-1-1.3-2.1-1.4-2.9-.1-.8.1-1.5.5-2.1Z" />
+    </svg>
+  )
+}
+
 export default function Page() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [activeMobileSection, setActiveMobileSection] = useState<string | null>(null)
   const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null)
   const [activeOverlay, setActiveOverlay] = useState<'search' | 'cart' | null>(null)
   const [activeReelIndex, setActiveReelIndex] = useState<number | null>(null)
@@ -258,6 +276,24 @@ export default function Page() {
   const newLaunchTrack = useRef<HTMLDivElement>(null)
   const productsTrack = useRef<HTMLDivElement>(null)
   const reelsTrack = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setMenuOpen(false)
+        setActiveMobileSection(null)
+      }
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [menuOpen])
 
   useEffect(() => {
     if (activeReelIndex === null) return
@@ -358,38 +394,41 @@ export default function Page() {
 
       {/* NAVBAR */}
       <header className="sticky top-0 z-50 border-b border-[#282622]/10 bg-[#fcf9f5]/95 backdrop-blur-xl">
-        <div className="mx-auto flex h-[72px] max-w-[1380px] items-center justify-between px-4 sm:h-[82px] sm:px-6 lg:px-12">
+        <div className="mx-auto flex h-[68px] max-w-[1380px] items-center justify-between gap-2 px-3 sm:h-[82px] sm:gap-4 sm:px-6 lg:px-12">
           {/* MOBILE MENU */}
           <button
-            aria-label="Open menu"
-            className="mr-4 lg:hidden"
-            onClick={() => setMenuOpen(true)}
+            type="button"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
+            className="flex size-10 shrink-0 items-center justify-center text-[#806648] transition-colors hover:text-[#9a7435] lg:hidden"
+            onClick={() => setMenuOpen((open) => !open)}
           >
-            <Menu size={22} strokeWidth={1.4} />
+            {menuOpen ? <X size={22} strokeWidth={1.5} /> : <Menu size={22} strokeWidth={1.5} />}
           </button>
 
           {/* LOGO */}
-          <a href="#top" className="flex min-w-0 items-center gap-2.5 leading-none sm:gap-3">
+          <a href="#top" className="flex min-w-0 flex-1 items-center gap-2 leading-none sm:gap-3 lg:flex-initial">
             <Image
               src="/Golden Indian Bridal Portrait.png"
               alt="Raghunandan Jewellers bridal portrait"
               width={56}
               height={64}
               priority
-              className="h-11 w-10 border border-[#c99d68]/70 object-cover object-center sm:h-[54px] sm:w-12"
+              className="h-10 w-9 shrink-0 border border-[#c99d68]/70 object-cover object-center sm:h-[54px] sm:w-12"
             />
             <span className="flex min-w-0 flex-col">
-              <span className="font-serif text-[17px] uppercase tracking-[0.08em] sm:text-[22px] sm:tracking-[0.12em]">
+              <span className="truncate font-serif text-[15px] uppercase tracking-[0.04em] min-[380px]:text-[17px] sm:text-[22px] sm:tracking-[0.12em]">
                 Raghunandan
               </span>
-              <span className="mt-1.5 text-[7px] uppercase tracking-[0.26em] text-[#9a7435] sm:text-[8px] sm:tracking-[0.32em]">
+              <span className="mt-1.5 truncate text-[6px] uppercase tracking-[0.2em] text-[#9a7435] min-[380px]:text-[7px] sm:text-[8px] sm:tracking-[0.32em]">
                 Jewellers Legacy
               </span>
             </span>
           </a>
 
           {/* RIGHT ACTIONS */}
-          <div className="ml-auto flex items-center gap-4 sm:gap-7">
+          <div className="ml-auto flex shrink-0 items-center gap-2 min-[380px]:gap-3 sm:gap-7">
             <button
               type="button"
               aria-label="Search jewellery"
@@ -421,7 +460,7 @@ export default function Page() {
 
             <a
               href="/products"
-              className="border border-[#c99d68] px-5 py-3 text-[9px] uppercase tracking-[0.2em] text-[#9a7435] transition-colors hover:bg-[#9a7435] hover:text-white sm:px-7"
+              className="border border-[#c99d68] px-2 py-2 text-[8px] uppercase tracking-[0.08em] text-[#9a7435] transition-colors hover:bg-[#9a7435] hover:text-white min-[380px]:px-3 sm:px-7 sm:py-3 sm:text-[9px] sm:tracking-[0.2em]"
             >
               Shop
             </a>
@@ -548,25 +587,102 @@ export default function Page() {
 
         {/* MOBILE MENU */}
         {menuOpen && (
-          <div className="fixed inset-0 z-[100] bg-[#f8f6f1] p-6 lg:hidden">
-            <button
-              aria-label="Close menu"
-              onClick={() => setMenuOpen(false)}
+          <div
+            className="fixed inset-0 z-[100] bg-[#171411]/55 lg:hidden"
+            onClick={() => setMenuOpen(false)}
+          >
+            <aside
+              id="mobile-navigation"
+              aria-label="Mobile navigation"
+              className="flex h-dvh w-[min(88vw,390px)] flex-col overflow-y-auto overscroll-contain bg-[#fcf9f5] shadow-2xl"
+              onClick={(event) => event.stopPropagation()}
             >
-              <X size={24} strokeWidth={1.3} />
-            </button>
-
-            <nav className="mt-14 flex flex-col gap-6 font-serif text-3xl">
-              {primaryNavigation.map((item) => (
+              <div className="flex min-h-[76px] items-center justify-between border-b border-[#282622]/10 px-5">
                 <a
-                  key={item.label}
-                  href={item.featureHref}
+                  href="#top"
+                  className="flex items-center gap-2.5"
                   onClick={() => setMenuOpen(false)}
                 >
-                  {item.label}
+                  <Image
+                    src="/Golden Indian Bridal Portrait.png"
+                    alt=""
+                    width={38}
+                    height={44}
+                    className="h-10 w-8 border border-[#c99d68]/60 object-cover"
+                  />
+                  <span className="flex flex-col">
+                    <span className="font-serif text-base uppercase tracking-[0.08em]">Raghunandan</span>
+                    <span className="mt-1 text-[7px] uppercase tracking-[0.25em] text-[#9a7435]">Jewellers Legacy</span>
+                  </span>
                 </a>
-              ))}
-            </nav>
+                <button
+                  type="button"
+                  aria-label="Close menu"
+                  onClick={() => {
+                    setMenuOpen(false)
+                    setActiveMobileSection(null)
+                  }}
+                  className="flex size-10 items-center justify-center text-[#806648] hover:text-[#9a7435]"
+                >
+                  <X size={21} />
+                </button>
+              </div>
+
+              <nav className="flex-1 px-5 py-4">
+                {primaryNavigation.map((item) => {
+                  const expanded = activeMobileSection === item.label
+                  return (
+                    <div key={item.label} className="border-b border-[#282622]/10">
+                      <button
+                        type="button"
+                        aria-expanded={expanded}
+                        onClick={() => setActiveMobileSection(expanded ? null : item.label)}
+                        className="flex min-h-[58px] w-full items-center justify-between gap-4 text-left font-serif text-[22px] text-[#282622]"
+                      >
+                        {item.label}
+                        <ChevronDown
+                          size={17}
+                          className={`shrink-0 text-[#9a7435] transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+                        />
+                      </button>
+                      {expanded && (
+                        <div className="grid gap-1 pb-4 pl-3">
+                          <p className="pb-2 pr-4 text-[11px] leading-5 text-[#282622]/55">
+                            {item.description}
+                          </p>
+                          {item.links.map((link) => (
+                            <a
+                              key={link.label}
+                              href={link.href}
+                              onClick={() => {
+                                setMenuOpen(false)
+                                setActiveMobileSection(null)
+                              }}
+                              className="flex min-h-10 items-center justify-between text-[12px] text-[#806648] transition-colors hover:text-[#9a7435]"
+                            >
+                              {link.label}
+                              <ArrowRight size={13} />
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </nav>
+
+              <div className="border-t border-[#282622]/10 bg-[#f7ede3] p-5">
+                <a
+                  href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Namaste, I would like help choosing a jewellery piece.')}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex min-h-12 items-center justify-center gap-2 bg-[#a57d35] px-4 text-[9px] font-medium uppercase tracking-[0.15em] text-white"
+                >
+                  Chat with our team
+                  <ArrowRight size={14} />
+                </a>
+              </div>
+            </aside>
           </div>
         )}
       </header>
@@ -1490,11 +1606,29 @@ export default function Page() {
                           {reel.title}
                         </span>
                       </div>
-                      <div className="flex min-h-11 items-center justify-between gap-2 px-3 text-[8px] uppercase tracking-[0.13em] text-[#806648] transition-colors group-hover:text-[#9a7435] sm:px-4">
-                        <span>Watch reel</span>
-                        <ArrowRight size={13} className="shrink-0" />
-                      </div>
                     </button>
+                    <a
+                      href="/products"
+                      aria-label={`Shop ${products[reel.productIndex].name} for ₹${products[reel.productIndex].price.toLocaleString('en-IN')}`}
+                      className="flex min-h-[74px] items-center gap-2.5 border-t border-[#282622]/10 bg-white p-2 transition-colors hover:bg-[#fbf7f0] sm:gap-3 sm:p-2.5"
+                    >
+                      <Image
+                        src={products[reel.productIndex].image}
+                        alt=""
+                        width={58}
+                        height={58}
+                        className="size-12 shrink-0 border border-[#282622]/10 object-cover sm:size-[54px]"
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="line-clamp-2 block text-[10px] leading-[1.35] text-[#282622] sm:text-[11px]">
+                          {products[reel.productIndex].name}
+                        </span>
+                        <span className="mt-1.5 block text-xs font-semibold text-[#282622]">
+                          ₹{products[reel.productIndex].price.toLocaleString('en-IN')}
+                        </span>
+                      </span>
+                      <ArrowRight size={14} className="mr-1 shrink-0 text-[#9a7435]" />
+                    </a>
                   </article>
                 )
               })}
@@ -1683,63 +1817,10 @@ export default function Page() {
       </section>
 
       {/* =========================================================
-          CONTACT
-      ========================================================= */}
-
-      <section
-        id="contact"
-        className="bg-[#282622] px-6 py-24 text-[#f8f6f1] lg:px-12 lg:py-32"
-      >
-        <div className="mx-auto flex max-w-[1050px] flex-col items-center text-center">
-          <Sparkles
-            size={20}
-            className="mb-7 text-[#e8c987]"
-            strokeWidth={1}
-          />
-
-          <p className="text-[10px] uppercase tracking-[0.25em] text-[#e8c987]">
-            Your piece is waiting
-          </p>
-
-          <h2 className="mt-4 font-serif text-5xl leading-none tracking-[-0.04em] md:text-7xl">
-            Let&apos;s find something
-            <br />
-            <em className="font-normal text-[#e8c987]">
-              extraordinary.
-            </em>
-          </h2>
-
-          <p className="mt-7 max-w-md text-sm leading-7 text-white/60">
-            Speak with our jewellery advisors about a design,
-            a celebration, or simply a piece you cannot stop
-            thinking about.
-          </p>
-
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <a
-              href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Namaste Raghunandan Jewellers, I would like to know more about your jewellery collection.')}`}
-              className="bg-[#e8c987] px-7 py-4 text-[10px] uppercase tracking-[0.2em] text-[#282622] transition hover:bg-[#f0d59b]"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Enquire on WhatsApp
-            </a>
-
-            <a
-              href={`tel:${showroomPhone}`}
-              className="border border-white/30 px-7 py-4 text-[10px] uppercase tracking-[0.2em] transition hover:border-[#e8c987] hover:text-[#e8c987]"
-            >
-              Call {showroomPhoneDisplay}
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* =========================================================
           FOOTER
       ========================================================= */}
 
-      <footer className="bg-[#282622] px-5 text-[#f8f6f1]/70 sm:px-8 lg:px-12">
+      <footer id="contact" className="bg-[#282622] px-5 text-[#f8f6f1]/70 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-[1380px]">
           <div className="relative -mt-6 overflow-hidden border border-[#e8c987]/25 bg-[radial-gradient(ellipse_at_85%_15%,rgba(232,201,135,0.18),transparent_35%),linear-gradient(110deg,#38342c,#282622_70%)] px-6 py-7 shadow-[0_18px_48px_rgba(0,0,0,0.18)] sm:-mt-8 sm:px-9 sm:py-8 lg:flex lg:items-center lg:justify-between lg:px-12">
             <div className="pointer-events-none absolute -right-8 -top-20 size-52 rounded-full border border-[#e8c987]/15" />
@@ -1762,7 +1843,7 @@ export default function Page() {
                 rel="noreferrer"
                 className="inline-flex min-h-11 items-center justify-center gap-2 bg-[#e8c987] px-5 text-[8px] font-medium uppercase tracking-[0.14em] text-[#282622] transition-all hover:-translate-y-0.5 hover:bg-[#f0d59b]"
               >
-                <MessageCircle size={15} />
+                <WhatsAppMark className="size-4" />
                 Chat on WhatsApp
               </a>
               <a
@@ -1798,15 +1879,26 @@ export default function Page() {
                 Jewellery for every chapter worth remembering. Thoughtfully
                 chosen, beautifully crafted, and made to become part of your story.
               </p>
-              <a
-                href={instagramProfile}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Follow Raghunandan Jewellers on Instagram"
-                className="mt-5 inline-flex size-9 items-center justify-center border border-white/20 text-[#e8c987] transition-colors hover:border-[#e8c987] hover:bg-[#e8c987] hover:text-[#282622]"
-              >
-                <InstagramMark className="size-4" />
-              </a>
+              <div className="mt-5 flex items-center gap-2.5">
+                <a
+                  href={instagramProfile}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Follow Raghunandan Jewellers on Instagram"
+                  className="inline-flex size-10 items-center justify-center border border-white/25 text-[#e8c987] transition-colors hover:border-[#e8c987] hover:bg-[#e8c987] hover:text-[#282622]"
+                >
+                  <InstagramMark className="size-[18px]" />
+                </a>
+                <a
+                  href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Namaste, I would like to know more about Raghunandan Jewellers.')}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Chat with Raghunandan Jewellers on WhatsApp"
+                  className="inline-flex size-10 items-center justify-center border border-white/25 text-[#e8c987] transition-colors hover:border-[#e8c987] hover:bg-[#e8c987] hover:text-[#282622]"
+                >
+                  <WhatsAppMark className="size-[19px]" />
+                </a>
+              </div>
             </div>
 
             <div>
@@ -1849,15 +1941,25 @@ export default function Page() {
                 <Phone size={13} className="text-[#e8c987]" />
                 {showroomPhoneDisplay}
               </a>
-              <a
-                href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Namaste, I would like to know more about Raghunandan Jewellers.')}`}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 border border-[#e8c987]/50 px-4 text-[9px] font-medium uppercase tracking-[0.14em] text-[#f5d99c] transition-colors hover:bg-[#e8c987] hover:text-[#282622]"
-              >
-                <MessageCircle size={15} />
-                Chat on WhatsApp
-              </a>
+              <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3">
+                <a
+                  href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Namaste, I would like to know more about Raghunandan Jewellers.')}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Chat with Raghunandan Jewellers on WhatsApp"
+                  className="inline-flex min-h-10 items-center gap-2 bg-[#e8c987] px-3.5 text-[8px] font-medium uppercase tracking-[0.1em] text-[#282622] transition-colors hover:bg-[#f0d59b]"
+                >
+                  <WhatsAppMark className="size-[17px]" />
+                  WhatsApp us
+                </a>
+                <a
+                  href={`tel:${showroomPhone}`}
+                  className="inline-flex min-h-10 items-center gap-2 text-xs transition-colors hover:text-white"
+                >
+                  <Phone size={14} className="text-[#e8c987]" />
+                  {showroomPhoneDisplay}
+                </a>
+              </div>
             </div>
           </div>
 
